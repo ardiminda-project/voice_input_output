@@ -113,11 +113,14 @@ document.getElementById("pauseButton").addEventListener("click", () => {
     }
 });
 
-document.getElementById("resumeButton").addEventListener("click", () => {
-    if (speechSynthesis.paused) {
-        speechSynthesis.resume();
+// tombol ulangi playback
+document.getElementById("repeatButton").addEventListener("click", () => {
+    if (currentUtterance && currentUtterance.text) {
+        speechSynthesis.cancel();
+        speakText(currentUtterance.text);
     }
 });
+
 
 document.getElementById("sendButton").addEventListener("click", sendMessage);
 document.getElementById("voiceButton").addEventListener("click", startVoiceRecognition);
