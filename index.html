@@ -36,6 +36,19 @@
       font-weight: bold;
       margin-bottom: 15px;
     }
+    #loading {
+      display: none;
+      margin-top: 10px;
+      color: #007bff;
+      font-style: italic;
+    }
+    .controls {
+      margin-top: 15px;
+    }
+    .controls button {
+      width: 48%;
+      margin: 2px;
+    }
   </style>
 </head>
 <body>
@@ -44,7 +57,14 @@
     <input type="text" id="inputText" placeholder="Jawabanmu di sini">
     <button id="sendButton" style="display: none;">Kirim Jawaban</button>
     <button id="voiceButton">🎤 Jawab dengan Suara</button>
+    <p id="loading">⏳ Sedang memproses jawaban...</p>
     <p id="responseText"></p>
+
+    <!-- kontrol playback suara -->
+    <div class="controls">
+      <button id="pauseButton">⏸️ Pause</button>
+      <button id="resumeButton">▶️ Resume</button>
+    </div>
   </div>
   <script src="script.js"></script>
 </body>
