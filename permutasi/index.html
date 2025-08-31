@@ -53,7 +53,6 @@
 </head>
 <body>
   <div class="container">
-    <!-- List pertanyaan (disembunyikan, diambil lewat JS) -->
     <ul id="questions" style="display: none;">
       <li>Kenapa dalam menghitung urutan penampilan penari Topeng Malangan kita harus menggunakan permutasi?</li>
       <li>Apa arti tanda seru (!) dalam faktorial, dan mengapa penting untuk memahami permutasi?</li>
@@ -62,19 +61,41 @@
       <li>Mengapa pada susunan melingkar digunakan rumus (n-1)! ?</li>
     </ul>
 
-    <!-- Tempat pertanyaan aktif -->
     <p class="question" id="questionText"></p>
 
-    <input type="text" id="inputText" placeholder="Jawabanmu di sini">
-    <button id="sendButton" style="display: none;">Kirim Jawaban</button>
-    <button id="voiceButton">🎤 Jawab dengan Suara</button>
-    <p id="loading">⏳ Sedang memproses jawaban...</p>
-    <p id="responseText"></p>
+  <input type="text" id="inputText" placeholder="Jawabanmu di sini">
+  <button id="sendButton" style="display: none;">Kirim Jawaban</button>
+  <button id="voiceButton">🎤 Jawab dengan Suara</button>
+  <p id="loading">⏳ Sedang memproses jawaban...</p>
+  <p id="responseText"></p>
 
-    <!-- kontrol playback suara -->
-    <div class="controls">
-      <button id="pauseButton">⏸️ Pause</button>
-      <button id="repeatButton">🔁 Ulangi</button>
+  <!-- subtitle -->
+  <p id="subtitle" style="color: green; font-style: italic;"></p>
+
+  <!-- kontrol playback suara -->
+  <div class="controls">
+    <button id="pauseButton">⏸️ Pause</button>
+    <button id="repeatButton">🔁 Ulangi</button>
+  </div>
+
+  <!-- tombol coba lagi -->
+  <button id="retryButton" style="display: none; background: orange;">🔄 Coba Lagi</button>
+
+  <!-- skor & ringkasan -->
+  <div id="resultSummary" style="display:none; margin-top:20px; text-align:left;">
+    <h3>📊 Hasil Akhir</h3>
+    <p id="finalScore"></p>
+    <div style="overflow-x:auto;">
+      <table style="width:100%; border-collapse: collapse; margin-top: 10px; background: #fafafa;">
+      <thead>
+        <tr style="background: #e0e0e0;"></tr>
+        <th style="padding: 10px; border: 1px solid #ccc; text-align: left;">Pertanyaan</th>
+        <th style="padding: 10px; border: 1px solid #ccc; text-align: left;">Jawabanmu</th>
+        <th style="padding: 10px; border: 1px solid #ccc; text-align: left;">Koreksi AI</th>
+        </tr>
+      </thead>
+      <tbody id="summaryTable"></tbody>
+      </table>
     </div>
   </div>
   <script src="script.js"></script>

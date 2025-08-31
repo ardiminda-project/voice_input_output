@@ -1,34 +1,39 @@
 
 const API_KEY = 'AIzaSyBUhiDrEk7Wo4O2L-IZzRzpVZTtH_X-Nes';
 
-// ambil pertanyaan dari HTML <ul id="questions">
 const QUESTIONS = Array.from(document.querySelectorAll("#questions li")).map(li => li.innerText);
-
 let currentIndex = 0;
+let score = 0;
+let answersSummary = [];
+
 const questionEl = document.getElementById("questionText");
 const responseText = document.getElementById("responseText");
 const loadingEl = document.getElementById("loading");
+const subtitleEl = document.getElementById("subtitle");
+const retryButton = document.getElementById("retryButton");
+const summaryTable = document.getElementById("summaryTable");
+const finalScoreEl = document.getElementById("finalScore");
+const resultSummary = document.getElementById("resultSummary");
 
+questionEl.innerText = `Pertanyaan 1: ${QUESTIONS[0]}`;
 let currentUtterance = null;
-if (questionEl) {
-    questionEl.innerText = `Pertanyaan ${currentIndex + 1}: ` + QUESTIONS[currentIndex];
-}
-
+let lastAnswer = ""; // simpan jawaban terakhir user
 
 async function sendMessage() {
     const userAnswer = document.getElementById("inputText").value;
-
+    lastAnswer = userAnswer; // simpan
     loadingEl.style.display = "block";
     responseText.innerText = "";
+    subtitleEl.innerText = "";
 
     const prompt = `
 Kamu adalah evaluator jawaban kuis permutasi.
 Pertanyaan: "${QUESTIONS[currentIndex]}"
 Jawaban user: "${userAnswer}"
 
-Tugasmu: berikan penilaian apakah jawaban user benar atau salah,
-lalu berikan jawaban yang singkat, padat, jelas serta memiliki penjelasan yang lengkap. 
-Jangan gunakan karakter tambahan seperti *, #, dll.
+Tugasmu: berikan penilaian apakah jawaban user benar atau salah serta penjelasan kenapa bisa salah atau benar secara objektif,
+jelaskan dengan singkat, padat, jelas tanpa karakter tambahan (*, #, dll).
+Jawabanmu harus dimulai dengan "Benar" atau "Salah".
   `;
 
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${API_KEY}`;
@@ -46,32 +51,30 @@ Jangan gunakan karakter tambahan seperti *, #, dll.
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify(data)
+            body: JSON.stringify(data),
         });
-
         const result = await response.json();
-        console.log("API Response:", result);
-
         loadingEl.style.display = "none";
 
         if (result?.candidates?.[0]?.content?.parts?.[0]?.text) {
-            const text = result.candidates[0].content.parts[0].text;
+            const text = result.candidates[0].content.parts[0].text.trim();
             responseText.innerText = text;
             speakText(text);
 
-            // setelah jawaban keluar, lanjut pertanyaan berikutnya
-            if (currentIndex < QUESTIONS.length - 1) {
-                currentIndex++;
-                setTimeout(() => {
-                    document.getElementById("inputText").value = "";
-                    questionEl.innerText = `Pertanyaan ${currentIndex + 1}: ` + QUESTIONS[currentIndex];
-                }, 3000); // tunggu 3 detik baru ganti soal
-            } else {
-                setTimeout(() => {
-                    questionEl.innerText = "✅ Semua pertanyaan selesai!";
-                }, 3000);
-            }
+            // simpan ke ringkasan
+            answersSummary.push({
+                question: QUESTIONS[currentIndex],
+                answer: userAnswer,
+                ai: text,
+            });
 
+            // cek benar/salah
+            if (text.startsWith("Benar")) {
+                score++;
+                nextQuestion();
+            } else {
+                retryButton.style.display = "block"; // munculkan tombol coba lagi
+            }
         } else {
             responseText.innerText = "No valid response from API";
         }
@@ -81,14 +84,55 @@ Jangan gunakan karakter tambahan seperti *, #, dll.
     }
 }
 
-// text-to-speech
+// fungsi TTS + subtitle
 function speakText(text) {
-    if (speechSynthesis.speaking) {
-        speechSynthesis.cancel();
-    }
+    if (speechSynthesis.speaking) speechSynthesis.cancel();
+
     currentUtterance = new SpeechSynthesisUtterance(text);
     currentUtterance.lang = "id-ID";
+
+    const sentences = text.split(/(?<=[.?!])\s+/); // pecah jadi kalimat
+    let idx = 0;
+
+    currentUtterance.onboundary = function (event) {
+        if (event.name === "sentence" || event.charIndex >= sentences.slice(0, idx + 1).join(" ").length) {
+            subtitleEl.innerText = sentences[idx] || "";
+            idx++;
+        }
+    };
+
+    currentUtterance.onend = function () {
+        subtitleEl.innerText = "";
+    };
+
     speechSynthesis.speak(currentUtterance);
+}
+
+function nextQuestion() {
+    retryButton.style.display = "none";
+    if (currentIndex < QUESTIONS.length - 1) {
+        currentIndex++;
+        setTimeout(() => {
+            document.getElementById("inputText").value = "";
+            questionEl.innerText = `Pertanyaan ${currentIndex + 1}: ${QUESTIONS[currentIndex]}`;
+            responseText.innerText = "";
+        }, 2000);
+    } else {
+        showResult();
+    }
+}
+
+function showResult() {
+    questionEl.innerText = "✅ Semua pertanyaan selesai!";
+    resultSummary.style.display = "block";
+    finalScoreEl.innerText = `Skor akhir: ${score} dari ${QUESTIONS.length}`;
+
+    summaryTable.innerHTML = "";
+    answersSummary.forEach(row => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${row.question}</td><td>${row.answer}</td><td>${row.ai}</td>`;
+        summaryTable.appendChild(tr);
+    });
 }
 
 // voice input
@@ -97,12 +141,8 @@ function startVoiceRecognition() {
         alert("Browser Anda tidak mendukung Speech Recognition");
         return;
     }
-
     const recognition = new webkitSpeechRecognition();
     recognition.lang = "id-ID";
-    recognition.continuous = false;
-    recognition.interimResults = false;
-
     recognition.start();
 
     recognition.onresult = function (event) {
@@ -110,19 +150,19 @@ function startVoiceRecognition() {
         document.getElementById("inputText").value = transcript;
         sendMessage();
     };
-
-    recognition.onerror = function (event) {
-        console.error("Speech recognition error", event.error);
-    };
 }
+
+// tombol coba lagi
+retryButton.addEventListener("click", () => {
+    retryButton.style.display = "none";
+    document.getElementById("inputText").value = "";
+    responseText.innerText = "Silakan coba jawab lagi.";
+});
 
 // kontrol suara
 document.getElementById("pauseButton").addEventListener("click", () => {
-    if (speechSynthesis.speaking && !speechSynthesis.paused) {
-        speechSynthesis.pause();
-    }
+    if (speechSynthesis.speaking && !speechSynthesis.paused) speechSynthesis.pause();
 });
-
 document.getElementById("repeatButton").addEventListener("click", () => {
     if (currentUtterance?.text) {
         speechSynthesis.cancel();
@@ -130,5 +170,6 @@ document.getElementById("repeatButton").addEventListener("click", () => {
     }
 });
 
+// event listeners
 document.getElementById("sendButton").addEventListener("click", sendMessage);
 document.getElementById("voiceButton").addEventListener("click", startVoiceRecognition);
