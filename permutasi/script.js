@@ -1,4 +1,3 @@
-
 const API_KEY = 'AIzaSyBUhiDrEk7Wo4O2L-IZzRzpVZTtH_X-Nes';
 
 const QUESTIONS = Array.from(document.querySelectorAll("#questions li")).map(li => li.innerText);
@@ -14,10 +13,13 @@ const retryButton = document.getElementById("retryButton");
 const summaryTable = document.getElementById("summaryTable");
 const finalScoreEl = document.getElementById("finalScore");
 const resultSummary = document.getElementById("resultSummary");
+const timerEl = document.getElementById("timer");
+const nextButton = document.getElementById("nextButton");
 
 questionEl.innerText = `Pertanyaan 1: ${QUESTIONS[0]}`;
 let currentUtterance = null;
-let lastAnswer = ""; // simpan jawaban terakhir user
+let lastAnswer = "";
+let timerInterval = null;
 
 async function sendMessage() {
     const userAnswer = document.getElementById("inputText").value;
@@ -29,9 +31,9 @@ async function sendMessage() {
     const prompt = `
 Kamu adalah evaluator jawaban kuis permutasi.
 Pertanyaan: "${QUESTIONS[currentIndex]}"
-Jawaban user: "${userAnswer}"
+Jawaban pengguna: "${userAnswer}"
 
-Tugasmu: berikan penilaian apakah jawaban user benar atau salah serta penjelasan kenapa bisa salah atau benar secara objektif,
+Tugasmu: berikan penilaian apakah jawaban pengguna benar atau salah serta penjelasan kenapa bisa salah atau benar secara objektif,
 jelaskan dengan singkat, padat, jelas tanpa karakter tambahan (*, #, dll).
 Jawabanmu harus dimulai dengan "Benar" atau "Salah".
   `;
@@ -59,7 +61,11 @@ Jawabanmu harus dimulai dengan "Benar" atau "Salah".
         if (result?.candidates?.[0]?.content?.parts?.[0]?.text) {
             const text = result.candidates[0].content.parts[0].text.trim();
             responseText.innerText = text;
-            speakText(text);
+
+            // Delay sebelum suara dimulai (ubah 1000 untuk mengatur delay)
+            setTimeout(() => {
+                speakText(text);
+            }, 0);
 
             // simpan ke ringkasan
             answersSummary.push({
@@ -71,9 +77,9 @@ Jawabanmu harus dimulai dengan "Benar" atau "Salah".
             // cek benar/salah
             if (text.startsWith("Benar")) {
                 score++;
-                nextQuestion();
+                nextButton.style.display = "block"; 
             } else {
-                retryButton.style.display = "block"; // munculkan tombol coba lagi
+                retryButton.style.display = "block";
             }
         } else {
             responseText.innerText = "No valid response from API";
@@ -110,13 +116,13 @@ function speakText(text) {
 
 function nextQuestion() {
     retryButton.style.display = "none";
+    nextButton.style.display = "none";
     if (currentIndex < QUESTIONS.length - 1) {
         currentIndex++;
-        setTimeout(() => {
-            document.getElementById("inputText").value = "";
-            questionEl.innerText = `Pertanyaan ${currentIndex + 1}: ${QUESTIONS[currentIndex]}`;
-            responseText.innerText = "";
-        }, 2000);
+        document.getElementById("inputText").value = "";
+        questionEl.innerText = `Pertanyaan ${currentIndex + 1}: ${QUESTIONS[currentIndex]}`;
+        responseText.innerText = "";
+        subtitleEl.innerText = "";
     } else {
         showResult();
     }
@@ -157,6 +163,12 @@ retryButton.addEventListener("click", () => {
     retryButton.style.display = "none";
     document.getElementById("inputText").value = "";
     responseText.innerText = "Silakan coba jawab lagi.";
+    subtitleEl.innerText = "";
+});
+
+// tombol lanjut soal
+nextButton.addEventListener("click", () => {
+    nextQuestion();
 });
 
 // kontrol suara

@@ -13,6 +13,14 @@
       height: 100vh;
       background-color: #f0f0f0;
     }
+    .form-control{
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
     .container {
       background: #fff;
       padding: 20px;
@@ -54,18 +62,22 @@
 <body>
   <div class="container">
     <ul id="questions" style="display: none;">
-      <li>Kenapa dalam menghitung urutan penampilan penari Topeng Malangan kita harus menggunakan permutasi?</li>
-      <li>Apa arti tanda seru (!) dalam faktorial, dan mengapa penting untuk memahami permutasi?</li>
+      <li>Bagaimana notasi faktorial? Dan digunakan saat apa?</li>
+      <li>Menurutmu apa itu permutasi?</li>
       <li>Kapan kita menggunakan rumus nPr = n! / (n-r)! ?</li>
       <li>Kapan kita menggunakan rumus n! / (p1! x p2! x ..) ?</li>
       <li>Mengapa pada susunan melingkar digunakan rumus (n-1)! ?</li>
+      <li>Jika Pak Wawan berencana memilih 3 dari 4 topeng Malangan berbeda yang dimilikinya untuk diletakkan dalam pameran dengan layout melingkar, berapa banyak cara Pak Wawan memilihnya? Dan
+        Soal tersebut menggunakan permutasi jenis yang mana?</li>
     </ul>
 
     <p class="question" id="questionText"></p>
 
-  <input type="text" id="inputText" placeholder="Jawabanmu di sini">
-  <button id="sendButton" style="display: none;">Kirim Jawaban</button>
-  <button id="voiceButton">🎤 Jawab dengan Suara</button>
+  <textarea id="inputText" class="form-control" placeholder="Jawabanmu di sini"></textarea>
+  <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+    <button id="sendButton" style="flex:1;">⌨️ Jawab Dengan Text</button>
+    <button id="voiceButton" style="flex:1;">🎤 Jawab dengan Suara</button>
+  </div>
   <p id="loading">⏳ Sedang memproses jawaban...</p>
   <p id="responseText"></p>
 
@@ -80,6 +92,9 @@
 
   <!-- tombol coba lagi -->
   <button id="retryButton" style="display: none; background: orange;">🔄 Coba Lagi</button>
+
+  <!-- tombol lanjut soal -->
+  <button id="nextButton" style="display: none; background: green; color: white;">➡️ Lanjut Soal</button>
 
   <!-- skor & ringkasan -->
   <div id="resultSummary" style="display:none; margin-top:20px; text-align:left;">
