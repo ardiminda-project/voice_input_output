@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kuis AI Pythagoras</title>
+  <title>Kuis AI Kombinatorik</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -11,7 +11,18 @@
       justify-content: center;
       align-items: center;
       height: 100vh;
-      background-color: #f0f0f0;
+      background-image: url('../asset/bg.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+    .form-control{
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
     }
     .container {
       background: #fff;
@@ -53,17 +64,54 @@
 </head>
 <body>
   <div class="container">
-    <p class="question" id="questionText">Pertanyaan: Apa fungsi dari Pythagoras?</p>
-    <input type="text" id="inputText" placeholder="Jawabanmu di sini">
-    <button id="sendButton" style="display: none;">Kirim Jawaban</button>
-    <button id="voiceButton">🎤 Jawab dengan Suara</button>
-    <p id="loading">⏳ Sedang memproses jawaban...</p>
-    <p id="responseText"></p>
+    <ul id="questions" style="display: none;">
+      <li>Dalam Tari Topeng Malangan, kapan kita menggunakan kombinasi dan bukan permutasi?</li>
+      <li>Saat membentuk kelompok latihan, dipilih 2 orang dari 8 penari. Mengapa kasus ini 
+          termasuk kombinasi? </li>
+      <li>Misalnya ada 6 penari, dan hanya dipilih 2 untuk tampil. Berapakah banyaknya cara memilih 
+          jika urutan tidak penting?</li>
+    </ul>
 
-    <!-- kontrol playback suara -->
-    <div class="controls">
-      <button id="pauseButton">⏸️ Pause</button>
-       <button id="repeatButton">🔁 Ulangi</button>
+    <p class="question" id="questionText"></p>
+
+  <textarea id="inputText" class="form-control" placeholder="Jawabanmu di sini"></textarea>
+  <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+    <button id="sendButton" style="flex:1;">⌨️ Jawab Dengan Text</button>
+    <button id="voiceButton" style="flex:1;">🎤 Jawab dengan Suara</button>
+  </div>
+  <p id="loading">⏳ Sedang memproses jawaban...</p>
+  <p id="responseText"></p>
+
+  <!-- subtitle -->
+  <p id="subtitle" style="color: green; font-style: italic;"></p>
+
+  <!-- kontrol playback suara -->
+  <div class="controls">
+    <button id="pauseButton">⏸️ Pause</button>
+    <button id="repeatButton">🔁 Ulangi</button>
+  </div>
+
+  <!-- tombol coba lagi -->
+  <button id="retryButton" style="display: none; background: orange;">🔄 Coba Lagi</button>
+
+  <!-- tombol lanjut soal -->
+  <button id="nextButton" style="display: none; background: green; color: white;">➡️ Lanjut Soal</button>
+
+  <!-- skor & ringkasan -->
+  <div id="resultSummary" style="display:none; margin-top:20px; text-align:left;">
+    <h3>📊 Hasil Akhir</h3>
+    <p id="finalScore"></p>
+    <div style="overflow-x:auto;">
+      <table style="width:100%; border-collapse: collapse; margin-top: 10px; background: #fafafa;">
+      <thead>
+        <tr style="background: #e0e0e0;"></tr>
+        <th style="padding: 10px; border: 1px solid #ccc; text-align: left;">Pertanyaan</th>
+        <th style="padding: 10px; border: 1px solid #ccc; text-align: left;">Jawabanmu</th>
+        <th style="padding: 10px; border: 1px solid #ccc; text-align: left;">Koreksi AI</th>
+        </tr>
+      </thead>
+      <tbody id="summaryTable"></tbody>
+      </table>
     </div>
   </div>
   <script src="script.js"></script>
