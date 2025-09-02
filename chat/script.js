@@ -1,11 +1,23 @@
-// Ganti dengan API key Anda
 const API_KEY = 'AIzaSyDbs9VXqEVHK8i4o2Ns77-lEC7ucK9Ekok';
 
 async function sendMessage() {
     const inputText = document.getElementById('inputText').value;
     const responseText = document.getElementById('responseText');
 
-    const prompt = 'Kamu adalah guru matematika yang sangat pintar dan sabar. anda akan menjawab pertanyan ini dengan terurut: ' + inputText;
+    // custom prompt untuk kombinatorik & etnomatematika budaya Malang
+    const prompt = `
+Kamu adalah guru matematika yang sangat pintar dan sabar. 
+Jawablah pertanyaan berikut dengan bahasa yang singkat, jelas, padat, namun tetap lengkap.
+
+Pertanyaan: ${inputText}
+
+Syarat jawabanmu:
+1. Penjelasan harus berada dalam ranah kombinatorik dan permutasi.
+2. Kaitkan jawaban dengan etnomatematika budaya Malang, misalnya Topeng Malangan, batik, tarian, atau tradisi lokal.
+3. Jangan gunakan simbol aneh atau karakter tambahan seperti *, #, ~.
+4. Jawaban harus enak dibaca, runtut, dan mudah dipahami oleh siswa SMA.
+`;
+
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${API_KEY}`;
     const data = {
         contents: [{
@@ -26,10 +38,8 @@ async function sendMessage() {
 
         const result = await response.json();
 
-        // Log the entire result for debugging
         console.log('API Response:', result);
 
-        // Check if the response structure matches the expected format and extract the text
         if (result && result.candidates && result.candidates.length > 0 &&
             result.candidates[0].content && result.candidates[0].content.parts &&
             result.candidates[0].content.parts.length > 0) {
@@ -42,6 +52,7 @@ async function sendMessage() {
         responseText.innerText = 'Error: ' + error.message;
     }
 }
+
 
 // Tambahkan event listener ke tombol
 document.getElementById('sendButton').addEventListener('click', sendMessage);
