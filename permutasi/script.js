@@ -10,7 +10,7 @@ const responseText = document.getElementById("responseText");
 const loadingEl = document.getElementById("loading");
 const subtitleEl = document.getElementById("subtitle");
 const retryButton = document.getElementById("retryButton");
-const summaryTable = document.getElementById("summaryTable");
+const summaryCards = document.getElementById("summaryCards");
 const finalScoreEl = document.getElementById("finalScore");
 const resultSummary = document.getElementById("resultSummary");
 const timerEl = document.getElementById("timer");
@@ -27,6 +27,10 @@ async function sendMessage() {
     loadingEl.style.display = "block";
     responseText.innerText = "";
     subtitleEl.innerText = "";
+
+    // sembunyikan semua tombol saat mulai proses
+    retryButton.style.display = "none";
+    nextButton.style.display = "none";
 
     const prompt = `
 Kamu adalah evaluator jawaban kuis permutasi.
@@ -75,11 +79,13 @@ Jawabanmu harus dimulai dengan "Benar" atau "Salah".
             });
 
             // cek benar/salah
-            if (text.startsWith("Benar")) {
+            if (text.toLowerCase().startsWith("benar")) {
                 score++;
-                nextButton.style.display = "block"; 
+                // tombol akan tampil setelah suara selesai
+            } else if (text.toLowerCase().startsWith("salah")) {
+                // tombol akan tampil setelah suara selesai
             } else {
-                retryButton.style.display = "block";
+                // tombol akan tampil setelah suara selesai
             }
         } else {
             responseText.innerText = "No valid response from API";
@@ -109,6 +115,18 @@ function speakText(text) {
 
     currentUtterance.onend = function () {
         subtitleEl.innerText = "";
+
+        // Tampilkan tombol setelah suara selesai
+        if (text.toLowerCase().startsWith("benar")) {
+            nextButton.style.display = "block";
+            retryButton.style.display = "none";
+        } else if (text.toLowerCase().startsWith("salah")) {
+            retryButton.style.display = "block";
+            nextButton.style.display = "none";
+        } else {
+            retryButton.style.display = "block";
+            nextButton.style.display = "none";
+        }
     };
 
     speechSynthesis.speak(currentUtterance);
@@ -129,15 +147,27 @@ function nextQuestion() {
 }
 
 function showResult() {
-    questionEl.innerText = "✅ Semua pertanyaan selesai!";
     resultSummary.style.display = "block";
     finalScoreEl.innerText = `Skor akhir: ${score} dari ${QUESTIONS.length}`;
 
-    summaryTable.innerHTML = "";
-    answersSummary.forEach(row => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `<td>${row.question}</td><td>${row.answer}</td><td>${row.ai}</td>`;
-        summaryTable.appendChild(tr);
+    summaryCards.innerHTML = "";
+    answersSummary.forEach((row, index) => {
+        const card = document.createElement("div");
+        card.className = "result-card";
+
+        card.innerHTML = `
+            <div class="card-header">Soal ${index + 1}</div>
+            <div class="card-answer">
+                <strong>� Jawabanmu:</strong><br>
+                ${row.answer}
+            </div>
+            <div class="card-ai">
+                <strong>🤖 Koreksi AI:</strong><br>
+                ${row.ai}
+            </div>
+        `;
+
+        summaryCards.appendChild(card);
     });
 }
 
