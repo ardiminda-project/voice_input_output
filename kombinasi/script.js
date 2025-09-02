@@ -1,4 +1,4 @@
-const API_KEY = 'AIzaSyBUhiDrEk7Wo4O2L-IZzRzpVZTtH_X-Nes';
+const API_KEY = 'AIzaSyDbs9VXqEVHK8i4o2Ns77-lEC7ucK9Ekok';
 
 const QUESTIONS = Array.from(document.querySelectorAll("#questions li")).map(li => li.innerText);
 let currentIndex = 0;
@@ -29,7 +29,7 @@ async function sendMessage() {
     subtitleEl.innerText = "";
 
     const prompt = `
-Kamu adalah evaluator jawaban kuis permutasi.
+Kamu adalah evaluator jawaban kuis kombinasi.
 Pertanyaan: "${QUESTIONS[currentIndex]}"
 Jawaban pengguna: "${userAnswer}"
 
