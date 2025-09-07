@@ -18,7 +18,7 @@ Syarat jawabanmu:
 4. Jawaban harus enak dibaca, runtut, dan mudah dipahami oleh siswa SMA.
 `;
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${API_KEY}`;
+    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-pro:generateContent?key=${API_KEY}`;
     const data = {
         contents: [{
             parts: [{

@@ -42,7 +42,7 @@ jelaskan dengan singkat, padat, jelas tanpa karakter tambahan (*, #, dll).
 Jawabanmu harus dimulai dengan "Benar" atau "Salah".
   `;
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${API_KEY}`;
+    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-pro:generateContent?key=${API_KEY}`;
     const data = {
         contents: [{
             parts: [{
